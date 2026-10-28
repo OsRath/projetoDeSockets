@@ -14,16 +14,25 @@ class GameTests(unittest.TestCase):
             ("rock", "paper", "lost"),
             ("paper", "scissors", "lost"),
             ("paper", "rock", "won"),
-            ("papier", "papier", "unentschieden"),
+            ("paper", "paper", "equal"),
         ]
         for player, server, expected in cases:
             with self.subTest(player=player, server=server):
                 self.assertEqual(winner(player, server), expected)
                 with patch("game.random.choice", return_value=server):
-                    self.assertEqual(play(f"PLAY {player}"), f"OK {player} {server} {expected}")
+                    self.assertEqual(
+                        play(f"PLAY {player}"),
+                        f"OK {player} {server} {expected}",
+                    )
 
     def test_invalid_requests(self):
-        for message in ("", "PLAY", "PLAY water", "DELETE rock", "PLAY rock paper"):
+        for message in (
+            "",
+            "PLAY",
+            "PLAY water",
+            "DELETE rock",
+            "PLAY rock paper",
+        ):
             self.assertTrue(play(message).startswith("ERROR "))
 
 
