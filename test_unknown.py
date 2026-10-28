@@ -1,20 +1,19 @@
-"""Separater Client fuer den Pflichtfall 'unbekannter Dienst'."""
+"""Separate client for the required 'unknown service' test case."""
 from config import NAME_SERVER
 from protocol import tcp_request
 
 
 def main():
     try:
-        response = tcp_request(NAME_SERVER, "LOOKUP nicht_registrierter_dienst")
+        response = tcp_request(NAME_SERVER, "LOOKUP unregistered_service")
         if response == "ERROR service_not_found":
-            print("Erwarteter Fehler: Der angefragte Dienst ist nicht registriert.")
-            print("Test erfolgreich: Client hat den Fehler korrekt behandelt.")
+            print("Expected error: The requested service is not registered.")
+            print("Test passed: The client handled the error correctly.")
             return 0
-        print(f"Unerwartete Antwort: {response}")
+        print(f"Unexpected response: {response}")
     except (OSError, ValueError) as error:
-        print(f"Namensserver nicht erreichbar oder ungueltige Antwort: {error}")
+        print(f"Name server unreachable or invalid response: {error}")
     return 1
-
 
 if __name__ == "__main__":
     raise SystemExit(main())

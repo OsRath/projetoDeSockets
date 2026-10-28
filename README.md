@@ -3,12 +3,6 @@
 Ein Konsolenprojekt fuer die Netzwerkaufgabe. Python 3.9 oder neuer, nur
 Standardbibliothek: keine Installation mit pip erforderlich.
 
-## In dein Repository uebernehmen
-
-ZIP entpacken und den INHALT des Ordners schere-stein-papier in deinen bereits
-geklonten Repository-Ordner kopieren. Vorhandene eigene Dateien vorher vergleichen.
-Diesen Repository-Ordner in VS Code oeffnen. Alle Befehle dort ausfuehren.
-Je nach Installation python durch python3 (macOS/Linux) oder py (Windows) ersetzen.
 
 ## Starten: vier Terminals in VS Code
 
@@ -27,9 +21,9 @@ Alle Server zum Schluss jeweils mit Strg+C beenden.
 Einzelne Runde:
 
 ```bash
-python tcp_client.py stein
-python udp_client.py papier
-python test_unknown.py
+python3 tcp_client.py stein
+python3 udp_client.py papier
+python3 test_unknown.py
 ```
 
 Der letzte Befehl soll den fehlenden Dienst melden und mit 'Test erfolgreich'

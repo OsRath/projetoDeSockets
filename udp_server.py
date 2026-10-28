@@ -1,4 +1,4 @@
-"""UDP-Spielserver: ein Datagramm enthaelt genau eine Spielanfrage."""
+"""UDP game server: a datagram contains exactly one game request."""
 import socket
 from concurrent.futures import ThreadPoolExecutor
 from config import UDP_ADDRESS, UDP_SERVICE, MAX_MESSAGE
@@ -17,14 +17,14 @@ def handle(server, data, address):
                 response = "ERROR invalid_encoding"
         server.sendto(encode(response), address)
     except OSError as error:
-        print(f"UDP-Fehler: {error}", flush=True)
+        print(f"UDP-Error: {error}", flush=True)
 
 
 def main():
     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as server:
         server.bind(UDP_ADDRESS)
         register(UDP_SERVICE, UDP_ADDRESS)
-        print(f"UDP-Spielserver bereit: {UDP_ADDRESS}", flush=True)
+        print(f"UDP-Server ready: {UDP_ADDRESS}", flush=True)
         with ThreadPoolExecutor(max_workers=8) as workers:
             while True:
                 data, address = server.recvfrom(MAX_MESSAGE + 1)
@@ -35,7 +35,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nUDP-Spielserver beendet.")
+        print("\nUDP-Server exited.")
     except (OSError, ValueError) as error:
-        print(f"Startfehler: {error}. Laeuft der Namensserver?")
+        print(f"Starting error: {error}. Is Nameservice running?")
         raise SystemExit(1)

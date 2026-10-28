@@ -23,7 +23,7 @@ def process(message):
             return "ERROR invalid_registration"
         with lock:
             services[name] = (host, port)
-        print(f"Registriert: {name} -> {host}:{port}", flush=True)
+        print(f"Registered: {name} -> {host}:{port}", flush=True)
         return "OK"
     if len(parts) == 2 and parts[0] == "LOOKUP":
         with lock:
@@ -44,14 +44,14 @@ def handle(connection):
                 response = "ERROR invalid_message"
             connection.sendall(encode(response))
         except OSError as error:
-            print(f"Verbindungsfehler: {error}", flush=True)
+            print(f"Connection error: {error}", flush=True)
 
 
 def main():
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server:
         server.bind(NAME_SERVER)
         server.listen()
-        print(f"Namensserver bereit: {NAME_SERVER}", flush=True)
+        print(f"Nameserver ready: {NAME_SERVER}", flush=True)
         while True:
             connection, _ = server.accept()
             threading.Thread(target=handle, args=(connection,), daemon=True).start()
@@ -61,7 +61,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nNamensserver beendet.")
+        print("\nNamensserver stopped.")
     except OSError as error:
-        print(f"Startfehler: {error}")
+        print(f"Startingerror: {error}")
         raise SystemExit(1)

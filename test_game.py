@@ -6,14 +6,14 @@ from game import play, winner
 class GameTests(unittest.TestCase):
     def test_all_nine_results(self):
         cases = [
-            ("schere", "schere", "unentschieden"),
-            ("schere", "stein", "verloren"),
-            ("schere", "papier", "gewonnen"),
-            ("stein", "schere", "gewonnen"),
-            ("stein", "stein", "unentschieden"),
-            ("stein", "papier", "verloren"),
-            ("papier", "schere", "verloren"),
-            ("papier", "stein", "gewonnen"),
+            ("scissors", "scissors", "equal"),
+            ("scissors", "rock", "lost"),
+            ("scissors", "paper", "won"),
+            ("rock", "scissors", "won"),
+            ("rock", "rock", "equal"),
+            ("rock", "paper", "lost"),
+            ("paper", "scissors", "lost"),
+            ("paper", "rock", "won"),
             ("papier", "papier", "unentschieden"),
         ]
         for player, server, expected in cases:
@@ -23,7 +23,7 @@ class GameTests(unittest.TestCase):
                     self.assertEqual(play(f"PLAY {player}"), f"OK {player} {server} {expected}")
 
     def test_invalid_requests(self):
-        for message in ("", "PLAY", "PLAY wasser", "DELETE stein", "PLAY stein papier"):
+        for message in ("", "PLAY", "PLAY water", "DELETE rock", "PLAY rock paper"):
             self.assertTrue(play(message).startswith("ERROR "))
 
 

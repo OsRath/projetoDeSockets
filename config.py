@@ -1,4 +1,4 @@
-"""Feste Adressen fuer den lokalen Test auf einem Computer."""
+"""Fixed addresses for local testing on a computer."""
 HOST = "127.0.0.1"
 NAME_SERVER = (HOST, 5000)
 TCP_ADDRESS = (HOST, 5001)

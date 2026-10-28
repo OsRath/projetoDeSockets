@@ -16,7 +16,7 @@ def handle(connection):
                 response = "ERROR invalid_message"
             connection.sendall(encode(response))
         except OSError as error:
-            print(f"Verbindungsfehler: {error}", flush=True)
+            print(f"Connection error: {error}", flush=True)
 
 
 def main():
@@ -24,7 +24,7 @@ def main():
         server.bind(TCP_ADDRESS)
         server.listen()
         register(TCP_SERVICE, TCP_ADDRESS)
-        print(f"TCP-Spielserver bereit: {TCP_ADDRESS}", flush=True)
+        print(f"TCP-Server ready: {TCP_ADDRESS}", flush=True)
         while True:
             connection, _ = server.accept()
             threading.Thread(target=handle, args=(connection,), daemon=True).start()
@@ -34,7 +34,7 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nTCP-Spielserver beendet.")
+        print("\nTCP-Server stopped.")
     except (OSError, ValueError) as error:
-        print(f"Startfehler: {error}. Laeuft der Namensserver?")
+        print(f"Start error: {error}. Is the nameserver running?")
         raise SystemExit(1)
