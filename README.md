@@ -1,135 +1,97 @@
-# Schere, Stein, Papier mit TCP und UDP
+# Rock Paper Scissors with TCP and UDP
 
-Ein Konsolenprojekt fuer die Netzwerkaufgabe. Python 3.9 oder neuer, nur
-Standardbibliothek: keine Installation mit pip erforderlich.
+A command-line game using Python sockets. Run all programs on the same computer.
 
+## Requirements
 
-## Starten: vier Terminals in VS Code
+- Python 3.13.7 or newer.
+- No additional packages are needed.
 
-Terminal > Neues Terminal; mit dem Plus weitere Terminals anlegen.
-Die ersten drei Prozesse bleiben waehrend aller Tests aktiv.
+Open the project folder in VS Code. Run all commands from this folder. If `python3` does not work, try `python` or `py`.
 
-1. Terminal: `python nameserver.py`
-2. Terminal, sobald der Namensserver bereit ist: `python tcp_server.py`
-3. Terminal, sobald der Namensserver bereit ist: `python udp_server.py`
-4. Terminal: `python tcp_client.py`
+## Start the application
 
-Im Spiel schere, stein oder papier eingeben. q beendet den Client.
-Danach im vierten Terminal: `python udp_client.py`.
-Alle Server zum Schluss jeweils mit Strg+C beenden.
+Open four terminals using **Terminal → New Terminal**.
 
-Einzelne Runde:
+Start the servers in this order and keep them running:
+
+**Terminal 1 — Name server**
 
 ```bash
-python3 tcp_client.py stein
-python3 udp_client.py papier
+python3 nameserver.py
+```
+
+**Terminal 2 — TCP game server**
+
+```bash
+python3 tcp_server.py
+```
+
+**Terminal 3 — UDP game server**
+
+```bash
+python3 udp_server.py
+```
+
+Wait for each server to confirm that it is ready.
+
+**Terminal 4 — Play using TCP**
+
+```bash
+python3 tcp_client.py
+```
+
+Enter `rock`, `paper`, or `scissors`. The client displays the result and response time. Enter `q` to quit.
+
+Then try UDP:
+
+```bash
+python3 udp_client.py
+```
+
+To stop the application, quit the client and press **Ctrl+C** in each server terminal.
+
+If you restart the name server, restart both game servers too.
+
+## Run a single round
+
+With all three servers running:
+
+```bash
+python3 tcp_client.py rock
+python3 udp_client.py paper
+```
+
+## Test an unknown service
+
+With the name server running:
+
+```bash
 python3 test_unknown.py
 ```
 
-Der letzte Befehl soll den fehlenden Dienst melden und mit 'Test erfolgreich'
-enden. Er erfindet keinen Ersatzdienst und stuerzt nicht ab.
+The client should report that the service is not registered and display `Test passed`.
 
-## Vergleichsmessungen (ohne Wireshark moeglich)
+## Run the game tests
+
+No servers are needed for this command:
 
 ```bash
-python tcp_client.py stein --repeat 100 --csv docs/tcp_results.csv
-python udp_client.py stein --repeat 100 --csv docs/udp_results.csv
+python3 -m unittest test_game -v
 ```
 
-Die CSV-Zieldateien werden ueberschrieben. Jede Runde erzeugt eine neue Verbindung
-beziehungsweise einen neuen UDP-Socket und fragt zuvor erneut den Namensserver.
-- request_ms: direkt vor dem Senden der Spielanfrage bis zur kompletten Antwort;
-  ohne Namenssuche und TCP-Verbindungsaufbau.
-- total_ms: Namenssuche, Verbindungsaufbau und Anfrage/Antwort zusammen.
+## Measure response times
 
-Vergleiche jeweils dieselbe Spalte, gleiche Rundenzahl und gleiche Bedingungen.
-Die Ausgabe nennt den Mittelwert von request_ms. Ein lokaler Test allein beweist
-nicht, dass ein Protokoll allgemein schneller ist. UDP hat keine Zustellgarantie;
-es gibt einen Timeout von 3 Sekunden und keine automatische Wiederholung.
-Es werden keine realen Messergebnisse mitgeliefert: eigene Messungen erstellen.
+Keep all three servers running. Make sure a folder named `docs` exists in the project folder.
 
-## Dateien und Aufbau
+Run 100 rounds for each protocol:
 
-| Datei | Aufgabe |
-|---|---|
-| config.py | Feste Serveradressen, Dienstnamen, Timeout |
-| protocol.py | Textnachrichten, TCP-Empfang bis Zeilenende, Registrierung/Suche |
-| game.py | Zufaellige Serverwahl und Spielregeln |
-| nameserver.py | Adressbuch mit Lock und einem Thread pro TCP-Verbindung |
-| tcp_server.py | TCP-Spielserver mit einem Thread pro Verbindung |
-| udp_server.py | UDP-Spielserver mit acht Worker-Threads |
-| client.py | Gemeinsame Bedienung, Dienstsuche, Zeitmessung, CSV-Export |
-| tcp_client.py / udp_client.py | Startpunkte der Clients |
-| test_unknown.py | Pflichtfall: unbekannter Dienst |
-| test_game.py | Automatischer Test aller neun Kombinationen |
-| docs/screenshots/ | Platz fuer eigene Screenshots |
-
-127.0.0.1 bedeutet: alle Programme laufen auf demselben Computer.
-Namensserver: TCP 5000, Spieldienst TCP 5001, Spieldienst UDP 5002.
-Falls ein Port belegt ist, die betreffende Konstante in config.py aendern.
-Clients verwenden fuer die Spielverbindung ausschliesslich die Adresse aus der
-Namensserverantwort, nicht TCP_ADDRESS oder UDP_ADDRESS.
-
-Der Server bindet zuerst seinen Port und registriert sich dann. Der Namensserver
-speichert sein Adressbuch nur im Arbeitsspeicher. Nach einem Neustart des
-Namensservers auch beide Spielserver neu starten. Gestoppte Spielserver werden
-nicht automatisch ausgetragen; die Clients behandeln Verbindungsfehler/Timeouts.
-Dieses einfache lokale Lehrprojekt hat keine Authentifizierung oder Verschluesselung.
-
-## Protokoll
-
-UTF-8-Text mit abschliessendem Zeilenumbruch. TCP wird bis zu diesem Zeilenumbruch
-eingelesen; ein einzelnes recv muss nicht die gesamte Nachricht liefern.
-Eine Anfrage pro TCP-Verbindung beziehungsweise UDP-Datagramm.
-Registrierung und Suche laufen fuer BEIDE Spielvarianten ueber TCP.
-
-```text
-REGISTER rps_tcp 127.0.0.1 5001
-OK
-
-REGISTER rps_udp 127.0.0.1 5002
-OK
-
-LOOKUP rps_tcp
-OK 127.0.0.1 5001
-
-LOOKUP nicht_registrierter_dienst
-ERROR service_not_found
-
-PLAY stein
-OK stein schere gewonnen
+```bash
+python3 tcp_client.py rock --repeat 100 --csv docs/tcp_results.csv
+python3 udp_client.py rock --repeat 100 --csv docs/udp_results.csv
 ```
 
-Spielantwort: OK Spielerwahl Serverwahl Ergebnis. Ergebnisse: gewonnen,
-verloren, unentschieden. Fehler beginnen mit ERROR. Registrierung mit bestehendem
-Namen aktualisiert den Eintrag; ungueltige IPs, Ports oder Namen werden abgelehnt.
+The client displays the average request time and saves the measurements to CSV. Existing files with the same names are overwritten.
 
-## Tests
-
-`python -m unittest test_game -v` benoetigt keine laufenden Server.
-Danach mit laufenden Servern beide Clients und test_unknown.py ausfuehren.
-Mehrere Client-Terminals gleichzeitig starten, um parallele Anfragen zu zeigen.
-
-## Wireshark spaeter
-
-Auf demselben Computer das Loopback-Interface verwenden. Die Aufzeichnung schon
-vor dem Start der Spielserver beginnen, damit ihre Registrierung sichtbar ist.
-Anschliessend beide Clients und den unbekannten Dienst testen.
-Anzeigefilter: `tcp.port == 5000 || tcp.port == 5001 || udp.port == 5002`
-Screenshots zu Registrierung, Dienstsuche, TCP-Spiel und UDP-Spiel erstellen.
-Bei TCP Verbindungsaufbau und Daten vergleichen; UDP besitzt keinen Handshake.
-Zu jedem Bild Ports, Ablauf und beobachtete Unterschiede erklaeren.
-
-## Noch fuer die Abgabe erledigen
-
-- Namen aller Gruppenmitglieder angeben (maximal drei).
-- Eigene Messungen, App-Screenshots und Wireshark-Aufnahmen erstellen.
-- Bericht nach der Kursvorlage verfassen: Beschreibung, Startanleitung,
-  Loesungsweg, Codeerklaerung, Screenshots, TCP/UDP-Vergleich und Fazit.
-- Eigenleistung/KI-Unterstuetzung ehrlich in eigenen Worten erklaeren.
-  Dieser Ausgangscode wurde mit KI erstellt. Jedes Gruppenmitglied sollte
-  den verwendeten Code verstehen und erklaeren koennen.
-- Repository-Link und Bericht abgeben; bei privatem Repository Lehrenden
-  und Tutoren Zugriff geben.
-
-Das Paket enthaelt die Anwendung, aber keinen fertigen Abgabebericht.
+- `request_ms`: time from sending the game request to receiving the response.
+- `total_ms`: also includes the service lookup and connection setup.
